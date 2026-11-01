@@ -94,11 +94,11 @@
 LlissiumOS/
 ├── build.sh                      # локальная сборка (нативно или через Docker)
 ├── build.bat                     # сборка из Windows через Docker Desktop
-├── pacman.conf                   # pacman с включённым multilib (для сборки и системы)
 ├── tools/generate-wallpaper.mjs  # генератор обоев и splash-фона (Node.js, без зависимостей)
 ├── .github/workflows/build.yml   # облачная сборка ISO в один клик
 └── archiso/                      # профиль ArchISO
     ├── profiledef.sh             # определение ISO + включение сервисов live-системы
+    ├── pacman.conf               # pacman с включённым multilib (для сборки; копия для системы — в airootfs)
     ├── packages.x86_64           # все пакеты дистрибутива
     ├── syslinux/                 # BIOS-загрузка (меню в теме Deep Eclipse)
     ├── efiboot/loader/           # UEFI-загрузка (systemd-boot)

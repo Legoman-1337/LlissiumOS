@@ -5,12 +5,10 @@ on:
     branches: [ main, master ]
     paths:
       - "archiso/**"
-      - "pacman.conf"
       - ".github/workflows/build.yml"
   pull_request:
     paths:
       - "archiso/**"
-      - "pacman.conf"
   workflow_dispatch:
   release:
     types: [ published ]
