@@ -33,7 +33,8 @@ mkdir -p "${_systemd_dir}/multi-user.target.wants" "${_systemd_dir}/graphical.ta
 
 _wants_link() {
     local link="$1" target="$2"
-    [[ -L "${link}" ]] || ln -s "${target}" "${link}"
+    rm -f "${link}"          # на случай файлов-копий, закоммиченных из Windows
+    ln -s "${target}" "${link}"
 }
 # systemd: инициализация ключей pacman на live-загрузке
 _wants_link "${_systemd_dir}/multi-user.target.wants/pacman-init.service" "../pacman-init.service"
