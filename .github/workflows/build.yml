@@ -1,0 +1,55 @@
+name: Build LlissiumOS ISO
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - "archiso/**"
+      - "pacman.conf"
+      - ".github/workflows/build.yml"
+  pull_request:
+    paths:
+      - "archiso/**"
+      - "pacman.conf"
+  workflow_dispatch:
+  release:
+    types: [ published ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      # git нужен actions/checkout внутри контейнера
+      - name: Установить archiso и git
+        run: pacman -Syu --noconfirm archiso git
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Собрать ISO
+        run: mkarchiso -v -C pacman.conf -w work -o out archiso/
+
+      - name: Упорядочить артефакты
+        run: |
+          mkdir -p release
+          cp out/*.iso release/
+          sha256sum out/*.iso > release/SHA256SUMS
+
+      - name: Загрузить артефакт ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: llissiumos-iso
+          path: release/*
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Приложить ISO к Release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pacman -S --noconfirm github-cli
+          for f in release/*; do
+            gh release upload "$GITHUB_REF_NAME" "$f" --clobber --repo "$GITHUB_REPOSITORY"
+          done

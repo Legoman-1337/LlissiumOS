@@ -1,0 +1,7 @@
+// LlissiumOS live: liveuser может запускать Calamares (pkexec) без пароля
+polkit.addRule(function(action, subject) {
+    if (subject.user === "liveuser" &&
+        action.id === "org.freedesktop.policykit.exec") {
+        return polkit.Result.YES;
+    }
+});

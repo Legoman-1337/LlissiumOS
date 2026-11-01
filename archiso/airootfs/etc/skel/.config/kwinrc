@@ -1,0 +1,12 @@
+[Effect-blur]
+BlurStrength=12
+NoiseStrength=0
+
+[Plugins]
+blurEnabled=true
+contrastEnabled=true
+kwin4_effect_dimscreenEnabled=false
+
+[org.kde.kdecoration2]
+library=org.kde.breeze
+theme=Breeze

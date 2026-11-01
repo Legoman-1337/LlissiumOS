@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# llissium-proton-ge — устанавливает последний GE-Proton для Steam.
+# Запуск: llissium-proton-ge [--quiet]
+set -euo pipefail
+
+QUIET=0
+[[ "${1:-}" == "--quiet" ]] && QUIET=1
+
+msg() { (( QUIET )) || echo "[llissium] $*"; }
+
+DEST="${HOME}/.local/share/Steam/compatibilitytools.d"
+mkdir -p "${DEST}"
+
+msg "Получаю информацию о последнем релизе GE-Proton..."
+TAG="$(curl -sfL https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | jq -r .tag_name)"
+if [[ -z "${TAG}" || "${TAG}" == "null" ]]; then
+    msg "Не удалось получить релиз GE-Proton (нет сети?). Попробуйте позже."
+    exit 0
+fi
+
+if [[ -d "${DEST}/${TAG}" ]]; then
+    msg "${TAG} уже установлен."
+    exit 0
+fi
+
+msg "Скачиваю ${TAG} (~400 МБ)..."
+TMP="$(mktemp -d)"
+trap 'rm -rf "${TMP}"' EXIT
+curl -sfL "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${TAG}/${TAG}.tar.gz" -o "${TMP}/${TAG}.tar.gz"
+curl -sfL "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${TAG}/${TAG}.checksum" -o "${TMP}/${TAG}.checksum" || true
+if [[ -f "${TMP}/${TAG}.checksum" ]]; then
+    msg "Проверяю контрольную сумму..."
+    (cd "${TMP}" && sha256sum -c "${TAG}.checksum" >/dev/null 2>&1) && msg "Сумма совпадает." || msg "Предупреждение: сумма не сверена."
+fi
+
+msg "Распаковываю в ${DEST}..."
+tar -xzf "${TMP}/${TAG}.tar.gz" -C "${DEST}"
+
+msg "Готово: ${TAG}. Выберите его в Steam: Свойства игры -> Совместимость."

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Install LlissiumOS
+Name[ru]=Установить LlissiumOS
+GenericName=Calamares System Installer
+Exec=pkexec /usr/bin/calamares
+Icon=calamares
+Terminal=false
+Categories=System;Installer;
+StartupNotify=true
+X-KDE-StartupNotify=true
+NoDisplay=false

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=GE-Proton Setup
+Name[ru]=Установка GE-Proton
+Exec=/usr/local/bin/llissium-proton-ge --quiet
+Terminal=false
+NoDisplay=true
+X-KDE-autostart-after=panel
+Categories=System;
