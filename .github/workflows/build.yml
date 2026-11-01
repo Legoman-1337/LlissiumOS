@@ -13,6 +13,10 @@ on:
   release:
     types: [ published ]
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +30,28 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Собрать ISO
-        run: mkarchiso -v -C pacman.conf -w work -o out archiso/
+        run: |
+          set -o pipefail
+          mkarchiso -v -C pacman.conf -w work -o out archiso/ 2>&1 | tee build.log
+          exit ${PIPESTATUS[0]}
+
+      - name: При падении — выложить хвост лога в Issue (для отладки)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pacman -S --noconfirm github-cli
+          tail -n 80 build.log > error-tail.txt || echo "build.log не создан" > error-tail.txt
+          {
+            echo "Автосборка упала: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo '```'
+            cat error-tail.txt
+            echo '```'
+          } > issue-body.md
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Build failed (run $GITHUB_RUN_ID)" \
+            --body-file issue-body.md || true
 
       - name: Упорядочить артефакты
         run: |
