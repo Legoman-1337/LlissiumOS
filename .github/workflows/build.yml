@@ -20,27 +20,25 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: archlinux:base-devel
     steps:
-      # git нужен actions/checkout внутри контейнера
-      - name: Установить archiso и git
-        run: pacman -Syu --noconfirm archiso git
-
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Собрать ISO
+      # mkarchiso требует привилегированный контейнер (mount /proc внутри
+      # pacstrap), поэтому контейнер запускается с --privileged из job'а.
+      - name: Собрать ISO в привилегированном контейнере Arch Linux
         run: |
           set -o pipefail
-          mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/ 2>&1 | tee build.log
-          exit ${PIPESTATUS[0]}
+          docker run --rm --privileged \
+            -v "$PWD":/project -w /project \
+            archlinux:base-devel \
+            bash -c 'pacman -Syu --noconfirm archiso git && mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/' 2>&1 | tee build.log
 
       - name: При падении — выложить хвост лога в Issue (для отладки)
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pacman -S --noconfirm github-cli
           tail -n 80 build.log > error-tail.txt || echo "build.log не создан" > error-tail.txt
           {
             echo "Автосборка упала: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
@@ -72,7 +70,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pacman -S --noconfirm github-cli
           for f in release/*; do
             gh release upload "$GITHUB_REF_NAME" "$f" --clobber --repo "$GITHUB_REPOSITORY"
           done
