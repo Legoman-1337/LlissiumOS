@@ -2,8 +2,8 @@
 # shellcheck disable=SC2034
 #
 # profiledef.sh — определение профиля ArchISO дистрибутива LlissiumOS.
-# Сборка: mkarchiso -v -w work -o out -C pacman.conf archiso/
-# (см. build.sh в корне репозитория; pacman.conf лежит здесь же, в archiso/)
+# Сборка: mkarchiso -v -w work -o out -C archiso/pacman.conf archiso/
+# (см. build.sh в корне репозитория; путь -C указывается от каталога запуска)
 
 iso_name="llissiumos"
 iso_label="LLISSIUM_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"

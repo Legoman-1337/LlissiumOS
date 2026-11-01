@@ -20,7 +20,7 @@ mkdir -p "$OUT"
 
 run_mkarchiso() {
     # shellcheck disable=SC2068
-    mkarchiso -v -C pacman.conf -w "$WORK" -o "$OUT" archiso/ "$@"
+    mkarchiso -v -C archiso/pacman.conf -w "$WORK" -o "$OUT" archiso/ "$@"
 }
 
 if command -v mkarchiso >/dev/null 2>&1 && [[ "$(uname -s)" == "Linux" ]]; then
@@ -33,7 +33,7 @@ elif command -v docker >/dev/null 2>&1; then
     docker run --rm --privileged \
         -v "$(pwd)":/project -w /project \
         archlinux:base-devel \
-        bash -c 'pacman -Syu --noconfirm archiso git && mkarchiso -v -C pacman.conf -w work -o out archiso/'
+        bash -c 'pacman -Syu --noconfirm archiso git && mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/'
 else
     cat <<'EOF'
 [llissium] Не найден ни mkarchiso, ни Docker.

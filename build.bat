@@ -12,7 +12,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-docker run --rm --privileged -v "%cd%":/project -w /project archlinux:base-devel bash -c "pacman -Syu --noconfirm archiso git && mkarchiso -v -C pacman.conf -w work -o out archiso/"
+docker run --rm --privileged -v "%cd%":/project -w /project archlinux:base-devel bash -c "pacman -Syu --noconfirm archiso git && mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/"
 
 echo.
 echo [llissium] Готово. ISO в папке out\ — см. README.md для записи через Rufus.

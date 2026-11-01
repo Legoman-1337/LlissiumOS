@@ -32,7 +32,7 @@ jobs:
       - name: Собрать ISO
         run: |
           set -o pipefail
-          mkarchiso -v -C pacman.conf -w work -o out archiso/ 2>&1 | tee build.log
+          mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/ 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
 
       - name: При падении — выложить хвост лога в Issue (для отладки)
