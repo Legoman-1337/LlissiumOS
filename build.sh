@@ -19,8 +19,10 @@ die() { printf '\033[1;31m[llissium] ОШИБКА:\033[0m %s\n' "$*" >&2; exit 1
 mkdir -p "$OUT"
 
 run_mkarchiso() {
+    bash tools/fetch-manjaro-calamares.sh localrepo
+    sed "s|__LOCAL_REPO__|$(pwd)/localrepo|" archiso/pacman.conf > /tmp/pacman-build.conf
     # shellcheck disable=SC2068
-    mkarchiso -v -C archiso/pacman.conf -w "$WORK" -o "$OUT" archiso/ "$@"
+    mkarchiso -v -C /tmp/pacman-build.conf -w "$WORK" -o "$OUT" archiso/ "$@"
 }
 
 if command -v mkarchiso >/dev/null 2>&1 && [[ "$(uname -s)" == "Linux" ]]; then
@@ -33,7 +35,11 @@ elif command -v docker >/dev/null 2>&1; then
     docker run --rm --privileged \
         -v "$(pwd)":/project -w /project \
         archlinux:base-devel \
-        bash -c 'pacman -Syu --noconfirm archiso git && mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/'
+        bash -c 'set -e
+            pacman -Syu --noconfirm archiso git
+            bash tools/fetch-manjaro-calamares.sh localrepo
+            sed "s|__LOCAL_REPO__|$PWD/localrepo|" archiso/pacman.conf > /tmp/pacman-build.conf
+            mkarchiso -v -C /tmp/pacman-build.conf -w work -o out archiso/'
 else
     cat <<'EOF'
 [llissium] Не найден ни mkarchiso, ни Docker.

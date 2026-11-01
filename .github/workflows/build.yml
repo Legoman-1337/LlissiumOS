@@ -32,7 +32,11 @@ jobs:
           docker run --rm --privileged \
             -v "$PWD":/project -w /project \
             archlinux:base-devel \
-            bash -c 'pacman -Syu --noconfirm archiso git && mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/' 2>&1 | tee build.log
+            bash -c 'set -e
+              pacman -Syu --noconfirm archiso git
+              bash tools/fetch-manjaro-calamares.sh localrepo
+              sed "s|__LOCAL_REPO__|$PWD/localrepo|" archiso/pacman.conf > /tmp/pacman-build.conf
+              mkarchiso -v -C /tmp/pacman-build.conf -w work -o out archiso/' 2>&1 | tee build.log
 
       - name: При падении — выложить хвост лога в Issue (для отладки)
         if: failure()

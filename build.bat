@@ -12,7 +12,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-docker run --rm --privileged -v "%cd%":/project -w /project archlinux:base-devel bash -c "pacman -Syu --noconfirm archiso git && mkarchiso -v -C archiso/pacman.conf -w work -o out archiso/"
+docker run --rm --privileged -v "%cd%":/project -w /project archlinux:base-devel bash -c "set -e; pacman -Syu --noconfirm archiso git; bash tools/fetch-manjaro-calamares.sh localrepo; sed \"s|__LOCAL_REPO__|$PWD/localrepo|\" archiso/pacman.conf > /tmp/pacman-build.conf; mkarchiso -v -C /tmp/pacman-build.conf -w work -o out archiso/"
 
 echo.
 echo [llissium] Готово. ISO в папке out\ — см. README.md для записи через Rufus.
