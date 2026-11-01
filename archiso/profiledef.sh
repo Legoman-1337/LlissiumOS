@@ -29,6 +29,7 @@ file_permissions=(
 # mkarchiso исполняет этот файл в Linux-окружении перед копированием airootfs.
 _profile_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 _systemd_dir="${_profile_dir}/airootfs/etc/systemd/system"
+mkdir -p "${_systemd_dir}/multi-user.target.wants" "${_systemd_dir}/graphical.target.wants"
 
 _wants_link() {
     local link="$1" target="$2"
